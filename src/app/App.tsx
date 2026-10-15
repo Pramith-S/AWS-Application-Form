@@ -36,10 +36,6 @@ interface FormData {
   // S4
   preferredTeam: string;
   whyTeam: string;
-  // S4b — Tech
-  techAreas: string[];
-  techTools: string[];
-  techProject: string;
   // S4b — Marketing
   marketingTools: string[];
   marketingCustomTools: string;
@@ -49,10 +45,6 @@ interface FormData {
   eventsExperience: string;
   eventsFocus: string;
   eventsDescription: string;
-  // S4b — Operations
-  opsComfort: string;
-  opsFocus: string;
-  opsDescription: string;
   // S5
   lowRegistrations: string;
   initiative: string;
@@ -83,9 +75,6 @@ const INITIAL: FormData = {
   achievements: "",
   preferredTeam: "",
   whyTeam: "",
-  techAreas: [],
-  techTools: [],
-  techProject: "",
   marketingTools: [],
   marketingCustomTools: "",
   marketingFocus: "",
@@ -93,9 +82,6 @@ const INITIAL: FormData = {
   eventsExperience: "",
   eventsFocus: "",
   eventsDescription: "",
-  opsComfort: "",
-  opsFocus: "",
-  opsDescription: "",
   lowRegistrations: "",
   initiative: "",
   taskDeadline: "",
@@ -112,7 +98,7 @@ const SECTIONS = [
   { id: 3, label: "Experience" },
   { id: 4, label: "Team" },
   { id: 5, label: "Leadership" },
-  { id: 6, label: "Builder" },
+  { id: 6, label: "Ideas" },
   { id: 7, label: "Commitment" },
   { id: 8, label: "Submit" },
 ];
@@ -156,30 +142,10 @@ const PARTICIPATION = [
 ];
 
 const TEAMS = [
-  "Tech Team — Automation, Web Dev, Technical Stuff",
   "Marketing — Design, Content Creation and Outreach",
   "Events — Production, Sponsorship and Outreach",
-  "Operations — Finance and Management",
 ];
 
-const TECH_AREAS = [
-  "Web Development",
-  "Automation & Scripting",
-  "Cloud & AWS",
-  "DevOps",
-  "Mobile Development",
-  "AI / ML",
-];
-const TECH_TOOLS = [
-  "HTML / CSS",
-  "JavaScript / TypeScript",
-  "Python",
-  "React",
-  "Node.js",
-  "Git",
-  "Docker",
-  "AWS CLI",
-];
 const MARKETING_TOOLS = [
   "Figma",
   "Canva",
@@ -201,13 +167,6 @@ const EVENTS_FOCUS = [
   "Outreach & Promotions",
   "All of the above",
 ];
-const OPS_FOCUS = [
-  "Finance & Budgeting",
-  "Team Coordination",
-  "Documentation & Reporting",
-  "Resource Planning",
-];
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function Label({
@@ -955,13 +914,6 @@ const handleSubmit = async () => {
             preferred_team: form.preferredTeam,
             why_team: form.whyTeam,
 
-            // Section 4b — Tech Team Details
-            tech_areas:
-              form.techAreas.length > 0 ? form.techAreas : null,
-            tech_tools:
-              form.techTools.length > 0 ? form.techTools : null,
-            tech_project: form.techProject || null,
-
             // Section 4b — Marketing Details
             marketing_tools:
               form.marketingTools.length > 0
@@ -977,11 +929,6 @@ const handleSubmit = async () => {
             events_experience: form.eventsExperience || null,
             events_focus: form.eventsFocus || null,
             events_description: form.eventsDescription || null,
-
-            // Section 4b — Operations Details
-            ops_comfort: form.opsComfort || null,
-            ops_focus: form.opsFocus || null,
-            ops_description: form.opsDescription || null,
 
             // Core Long Answers & Commitments
             low_registrations: form.lowRegistrations,
@@ -1035,29 +982,21 @@ const handleSubmit = async () => {
       req(form.preferredTeam, "Preferred Team");
       req(form.whyTeam, "Why this team");
     } else if (section === 4 && teamSection) {
-      if (form.preferredTeam.startsWith("Tech")) {
-        reqArr(form.techAreas, "At least one tech area");
-        reqArr(form.techTools, "At least one tech tool");
-        req(form.techProject, "Technical project description");
-      } else if (form.preferredTeam.startsWith("Marketing")) {
+      if (form.preferredTeam.startsWith("Marketing")) {
         reqArr(form.marketingTools, "At least one marketing tool");
         req(form.marketingFocus, "Area that excites you most");
       } else if (form.preferredTeam.startsWith("Events")) {
         req(form.eventsExperience, "Events experience");
         if (Array.isArray(form.eventsFocus)) reqArr(form.eventsFocus as string[], "At least one events focus area");
         req(form.eventsDescription, "Events experience description");
-      } else if (form.preferredTeam.startsWith("Operations")) {
-        req(form.opsComfort, "Ops comfort level");
-        if (Array.isArray(form.opsFocus)) reqArr(form.opsFocus as string[], "At least one ops focus area");
-        req(form.opsDescription, "Ops experience description");
       }
     } else if (section === 5) {
       req(form.lowRegistrations, "Low registrations answer");
       req(form.initiative, "Initiative / leadership answer");
       req(form.taskDeadline, "Task deadline answer");
     } else if (section === 6) {
-      req(form.projectIdea, "Project idea");
-      req(form.openSource, "Open source interest");
+      req(form.projectIdea, "Event or campaign idea");
+      req(form.openSource, "Collaboration interest");
     } else if (section === 7) {
       req(form.timeCommitment, "Time commitment");
       req(form.volunteer, "Volunteer availability");
@@ -1564,64 +1503,6 @@ const handleSubmit = async () => {
             </div>
           )}
 
-          {/* SECTION 4b — Tech Team */}
-          {section === 4 &&
-            teamSection &&
-            form.preferredTeam.startsWith("Tech") && (
-              <div>
-                <SectionHeader
-                  number="04b / 08"
-                  title="Tech Team — Detail"
-                  subtitle="Tell us about your technical interests and experience."
-                />
-                <div className="mb-4 px-3 py-2 rounded-lg bg-[#00D68F]/8 border border-[#00D68F]/20">
-                  <span className="text-xs font-['DM_Mono'] text-[#00D68F]">
-                    Selected: {form.preferredTeam}
-                  </span>
-                </div>
-                <FormField>
-                  <Label required>
-                    Which tech areas interest you?
-                  </Label>
-                  <p className="text-xs text-[#4a6080] font-['Inter'] mb-3">
-                    Select all that apply.
-                  </p>
-                  <CheckboxGroup
-                    options={TECH_AREAS}
-                    selected={form.techAreas}
-                    onChange={(v) => set("techAreas", v)}
-                  />
-                </FormField>
-                <FormField>
-                  <Label required>
-                    What languages or tools are you comfortable
-                    with?
-                  </Label>
-                  <p className="text-xs text-[#4a6080] font-['Inter'] mb-3">
-                    Select all that apply.
-                  </p>
-                  <CheckboxGroup
-                    options={TECH_TOOLS}
-                    selected={form.techTools}
-                    onChange={(v) => set("techTools", v)}
-                  />
-                </FormField>
-                <FormField>
-                  <Label required>
-                    Describe a technical project you've built or
-                    want to build.
-                  </Label>
-                  <WordHint />
-                  <TextArea
-                    value={form.techProject}
-                    onChange={(v) => set("techProject", v)}
-                    rows={4}
-                    placeholder="e.g. Built an AWS Lambda project, working on a React dashboard or automation script."
-                  />
-                </FormField>
-              </div>
-            )}
-
           {/* SECTION 4b — Marketing */}
           {section === 4 &&
             teamSection &&
@@ -1749,58 +1630,6 @@ const handleSubmit = async () => {
               </div>
             )}
 
-          {/* SECTION 4b — Operations */}
-          {section === 4 &&
-            teamSection &&
-            form.preferredTeam.startsWith("Operations") && (
-              <div>
-                <SectionHeader
-                  number="04b / 08"
-                  title="Operations — Detail"
-                  subtitle="Tell us about your management, finance, and coordination experience."
-                />
-                <div className="mb-4 px-3 py-2 rounded-lg bg-[#00D68F]/8 border border-[#00D68F]/20">
-                  <span className="text-xs font-['DM_Mono'] text-[#00D68F]">
-                    Selected: {form.preferredTeam}
-                  </span>
-                </div>
-                <FormField>
-                  <Label required>
-                    Are you comfortable with documentation,
-                    planning, and organisational tasks?
-                  </Label>
-                  <RadioGroup
-                    options={["Yes", "No", "Somewhat"]}
-                    value={form.opsComfort}
-                    onChange={(v) => set("opsComfort", v)}
-                  />
-                </FormField>
-                <FormField>
-                  <Label required>
-                    Which area interests you most?
-                  </Label>
-                  <RadioGroup
-                    options={OPS_FOCUS}
-                    value={form.opsFocus}
-                    onChange={(v) => set("opsFocus", v)}
-                  />
-                </FormField>
-                <FormField>
-                  <Label required>
-                    Describe any experience with management,
-                    coordination, or finance.
-                  </Label>
-                  <WordHint />
-                  <TextArea
-                    value={form.opsDescription}
-                    onChange={(v) => set("opsDescription", v)}
-                    rows={4}
-                    placeholder="e.g. Managed club budget, coordinated logistics for events, or maintained documentation for a student body."
-                  />
-                </FormField>
-              </div>
-            )}
-
           {/* SECTION 5 */}
           {section === 5 && (
             <div>
@@ -1856,28 +1685,28 @@ const handleSubmit = async () => {
             <div>
               <SectionHeader
                 number="06 / 08"
-                title="Open Source & Builder Mindset"
-                subtitle="What would you build if given the platform to do so?"
+                title="Ideas & Collaboration"
+                subtitle="What would you bring to the community if given the platform?"
               />
               <FormField>
                 <Label required>
-                  If given the opportunity, what project or
-                  initiative would you like AWS Student Builders
-                  to create at JSSATE?
+                  If given the opportunity, what event or
+                  campaign would you like AWS Student Builders
+                  to run at JSSATE?
                 </Label>
                 <WordHint />
                 <TextArea
                   value={form.projectIdea}
                   onChange={(v) => set("projectIdea", v)}
                   rows={5}
-                  placeholder="What problem does it solve, who does it help, and how would you build it?"
+                  placeholder="Who is it for, how would you promote it, and what would make it stand out?"
                 />
               </FormField>
               <FormField>
                 <Label required>
-                  Are you interested in contributing to
-                  open-source projects and inter-college
-                  collaborations?
+                  Are you interested in collaborating with
+                  other colleges and communities on joint
+                  events and campaigns?
                 </Label>
                 <RadioGroup
                   options={["Yes", "No", "Maybe"]}
